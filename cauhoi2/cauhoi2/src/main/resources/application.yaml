@@ -1,0 +1,16 @@
+server:
+  port: 8080
+  servlet:
+    context_path: /cauhoi
+
+spring:
+  datasource:
+    url: "jdbc:mysql://localhost:3306/cauhoi"
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+jwt:
+  signerKey: "8Tc7qBaLUU1YX1BSRULUB93pMHGF+bZ0DFJMkUfhfa2iLMyb7xtMmBGBNuMKMma1"
