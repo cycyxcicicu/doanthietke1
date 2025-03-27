@@ -1,16 +1,12 @@
 package com.example.cauhoi2.dto.response;
 
-import java.util.List;
-
-import com.example.cauhoi2.entity.Question;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -18,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class TestResponse {
     String testId;
     String name;

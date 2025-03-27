@@ -1,10 +1,5 @@
 package com.example.cauhoi2.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.cauhoi2.dto.request.ApiResponse;
 import com.example.cauhoi2.dto.request.UserCreateRequest;
 import com.example.cauhoi2.dto.request.UserUpdateRequest;
@@ -12,20 +7,14 @@ import com.example.cauhoi2.dto.request.UserUpdatepasswordRequest;
 import com.example.cauhoi2.dto.response.UserResponse;
 import com.example.cauhoi2.entity.User;
 import com.example.cauhoi2.service.UserService;
-
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import org.springframework.web.bind.annotation.PutMapping;
+import java.util.List;
 
 
 

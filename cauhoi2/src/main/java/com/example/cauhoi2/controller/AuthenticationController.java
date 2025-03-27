@@ -1,34 +1,21 @@
 package com.example.cauhoi2.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.cauhoi2.dto.request.ApiResponse;
-import com.example.cauhoi2.dto.request.AuthenticationRequest;
-import com.example.cauhoi2.dto.request.IntrospectRequest;
-import com.example.cauhoi2.dto.request.LogoutRequest;
-import com.example.cauhoi2.dto.request.RefreshRequest;
+import com.example.cauhoi2.dto.request.*;
 import com.example.cauhoi2.dto.response.AuthenticationResponse;
-import com.example.cauhoi2.dto.response.IntrospectRespone;
+import com.example.cauhoi2.dto.response.IntrospectResponse;
 import com.example.cauhoi2.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
-
 import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
-import java.util.jar.JarException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
+@Slf4j
 @RestController
 @RequestMapping("/auth")
-
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationController {
     @Autowired
@@ -40,31 +27,31 @@ public class AuthenticationController {
         
         var result=authenticationService.authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
-                        .result(result)
-                        .build();
+            .result(result)
+            .build();
     }
     @PostMapping("/introspect")
-    public ApiResponse<IntrospectRespone> authenticate(@RequestBody IntrospectRequest request)throws ParseException, JOSEException {
+    public ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)throws ParseException, JOSEException {
         
         var result=authenticationService.introspect(request);
         
-        return ApiResponse.<IntrospectRespone>builder()
-                        .result(result)
-                        .Code(1000)
-                        .build();
+        return ApiResponse.<IntrospectResponse>builder()
+            .result(result)
+            .code(1000)
+            .build();
     }
     @PostMapping("/logout")
-    ApiResponse<Void> Logout(@RequestBody LogoutRequest request) throws JOSEException, ParseException{
-         authenticationService.Logout(request);
+    ApiResponse<Void> Logout(@RequestHeader("Authorization") String bearerToken) throws JOSEException, ParseException{
+        authenticationService.Logout(bearerToken.replace("Bearer ", "").trim());
         return ApiResponse.<Void>builder()
-            .Code(1000)
-                .build();
+            .code(1000)
+            .build();
     }
     @PostMapping("/refresh")
     ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws JOSEException, ParseException{
-         var result =authenticationService.refreshToken(request);
+        var result =authenticationService.refreshToken(request);
         return ApiResponse.<AuthenticationResponse>builder()
-                .result(result)
-                .build();
+            .result(result)
+            .build();
     }
 }

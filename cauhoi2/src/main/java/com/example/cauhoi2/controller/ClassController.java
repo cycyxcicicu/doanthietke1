@@ -1,28 +1,27 @@
 package com.example.cauhoi2.controller;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.cauhoi2.dto.request.ApiResponse;
 import com.example.cauhoi2.dto.request.ClassCreationRequest;
 import com.example.cauhoi2.dto.request.ClassUpdateRequest;
 import com.example.cauhoi2.dto.response.ClassResponse;
 import com.example.cauhoi2.dto.response.UserOfClassResponse;
+import com.example.cauhoi2.exception.AppException;
+import com.example.cauhoi2.exception.ErrorCode;
 import com.example.cauhoi2.service.ClassService;
-
+import com.example.cauhoi2.service.UserService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/class")
 
@@ -30,6 +29,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class ClassController {
     @Autowired
     ClassService classService;
+    @Autowired
+    UserService userService;
     //tạo lớp
     @PostMapping("/{userid}")
     public ApiResponse<ClassResponse> createclass(@RequestBody ClassCreationRequest request,@PathVariable("userid") String id) {
@@ -45,10 +46,10 @@ public class ClassController {
         apiResponse.setResult(classService.getclass());
         return apiResponse;
     }
-    @GetMapping("/user/{userid}")
-    public ApiResponse<List<ClassResponse>> getClaszByUserid(@PathVariable("userid") String id) {
+    @GetMapping("/my-class")
+    public ApiResponse<List<ClassResponse>> getClaszByUserid() {
         ApiResponse<List<ClassResponse>> apiResponse = new ApiResponse<>();
-        apiResponse.setResult(classService.getclassbyid(id));
+        apiResponse.setResult(classService.getMyClasses());
         return apiResponse;
     }
     // sửa lớp

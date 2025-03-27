@@ -1,13 +1,12 @@
 package com.example.cauhoi2.exception;
 
+import com.example.cauhoi2.dto.request.ApiResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import com.example.cauhoi2.dto.request.ApiResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,7 +24,7 @@ public class GlobalExceptionHandler {
    ErrorCode errorCode = exception.getErrorCode();
    apiResponse.setCode(errorCode.getCode());
     apiResponse.setMessage(errorCode.getMessage());
-    return ResponseEntity.badRequest().body(apiResponse);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(apiResponse);
    }
 
 
@@ -44,7 +43,7 @@ public class GlobalExceptionHandler {
 
     apiResponse.setMessage(errorCode.getMessage());
 
-    return ResponseEntity.badRequest().body(apiResponse);
+    return ResponseEntity.status(errorCode.getHttpStatus()).body(apiResponse);
    }
    @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiResponse> handleForeignKeyConstraintViolation(DataIntegrityViolationException ex) {

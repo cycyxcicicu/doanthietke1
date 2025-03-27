@@ -1,14 +1,10 @@
 package com.example.cauhoi2.dto.request;
 
-import java.util.List;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import com.example.cauhoi2.entity.Question;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -17,8 +13,8 @@ import com.example.cauhoi2.entity.Question;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TestRequest {
     String name;
-    String imagetest;
-    int thoigian;
-    Boolean trangthai;
+    String imageTest;
+    int thoiGian;
+    Boolean trangThai;
     List<Question> questions;
 }

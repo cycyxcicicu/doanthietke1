@@ -1,11 +1,7 @@
 package com.example.cauhoi2.dto.request;
 
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -14,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserUpdatepasswordRequest {
-     @Size(min=8, message ="PASSWORK_INVALID")
+     @Size(min=8, message ="PASSWORD_INVALID")
      String password;
      String username;
 }

@@ -1,14 +1,9 @@
 package com.example.cauhoi2.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import jakarta.persistence.Entity;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 
@@ -18,8 +13,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class UserResponse {
-    String userid;
+    String userId;
     String username;
     String password;
     String nickname;

@@ -1,9 +1,5 @@
 package com.example.cauhoi2.service;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.example.cauhoi2.dto.request.UserCreateRequest;
 import com.example.cauhoi2.dto.request.UserUpdateRequest;
 import com.example.cauhoi2.dto.request.UserUpdatepasswordRequest;
@@ -13,13 +9,14 @@ import com.example.cauhoi2.exception.AppException;
 import com.example.cauhoi2.exception.ErrorCode;
 import com.example.cauhoi2.mapper.UserMapper;
 import com.example.cauhoi2.repository.UserRepository;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor

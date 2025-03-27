@@ -1,14 +1,12 @@
 package com.example.cauhoi2.mapper;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-
 import com.example.cauhoi2.dto.request.QuestionRequest;
 import com.example.cauhoi2.dto.response.QuestionResponse;
 import com.example.cauhoi2.entity.Question;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface QuestionMapper {

@@ -1,26 +1,22 @@
 package com.example.cauhoi2.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-
 import com.example.cauhoi2.dto.request.HistoryRequest;
-import com.example.cauhoi2.dto.response.HistoryReponse;
+import com.example.cauhoi2.dto.response.HistoryResponse;
 import com.example.cauhoi2.entity.History;
 import com.example.cauhoi2.entity.Question;
-import com.example.cauhoi2.entity.Test;
 import com.example.cauhoi2.exception.AppException;
 import com.example.cauhoi2.exception.ErrorCode;
 import com.example.cauhoi2.mapper.HistoryMapper;
 import com.example.cauhoi2.repository.HistoryRepository;
-
-import ch.qos.logback.core.spi.ErrorCodes;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,10 +24,10 @@ import lombok.experimental.FieldDefaults;
 public class HistoryService {
         HistoryRepository historyRepository;
         HistoryMapper historyMapper;
-public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
+public List<HistoryResponse> createHistory(List<HistoryRequest> request) {
    // Lấy thông tin userId và testId từ phần tử đầu tiên của request
-   String userId = request.get(0).getUserid();
-   String testId = request.get(0).getTestid();
+   String userId = request.get(0).getUserId();
+   String testId = request.get(0).getTestId();
 
    // Kiểm tra userId và testId có hợp lệ không
    if (userId == null || testId == null) {
@@ -42,7 +38,7 @@ public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
    List<String> testNumbers = historyRepository.findDistinctTestNumbers(userId, testId);
 
    // Tính số lần làm bài hiện tại (currentTestNumber)
-   Integer currentTestNumber = 1;
+   int currentTestNumber = 1;
 
    if (!testNumbers.isEmpty()) {
        try {
@@ -64,7 +60,7 @@ public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
    }
 
    // Danh sách lưu các HistoryResponse
-   List<HistoryReponse> historyReponses = new ArrayList<>();
+   List<HistoryResponse> historyReponses = new ArrayList<>();
 
    // Duyệt qua từng phần tử trong request để xử lý
    for (HistoryRequest historyRequest : request) {
@@ -72,7 +68,7 @@ public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
        History history = historyMapper.toHistory(historyRequest);
 
        // Tạo đối tượng Question từ questionid của HistoryRequest
-       String questionId = historyRequest.getQuestionid();
+       String questionId = historyRequest.getQuestionId();
        if (questionId == null) {
            throw new AppException(ErrorCode.NOT_USERID_TESTID);
        }
@@ -81,7 +77,7 @@ public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
        question.setQuestionsId(questionId);
 
        // Gán số lần làm bài (number) vào History
-       history.setNumber(currentTestNumber.toString());
+       history.setNumber(Integer.toString(currentTestNumber));
 
        // Gán Question vào History
        history.setQuestion(question);
@@ -90,8 +86,8 @@ public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
        historyRepository.save(history);
 
        // Chuyển History thành HistoryReponse
-       HistoryReponse historyReponse = historyMapper.toHistoryReponse(history);
-       historyReponse.setQuestionid(questionId);
+       HistoryResponse historyReponse = historyMapper.toHistoryReponse(history);
+       historyReponse.setQuestionId(questionId);
 
        // Thêm vào danh sách kết quả
        historyReponses.add(historyReponse);
@@ -100,16 +96,16 @@ public List<HistoryReponse> createHistory(List<HistoryRequest> request) {
    // Trả về danh sách các HistoryReponse
    return historyReponses;
 }
-public List<HistoryReponse> gethistory( String testid,String userid){
+public List<HistoryResponse> gethistory(String testid, String userid){
     
     List<History> histories = historyRepository.getHistoryUserTest(testid, userid);
-    List<HistoryReponse> historyReponses = new ArrayList<>();
+    List<HistoryResponse> historyReponses = new ArrayList<>();
     for ( History history : histories){
-        HistoryReponse historyReponse = new HistoryReponse();
+        HistoryResponse historyReponse = new HistoryResponse();
 
         String questionId = history.getQuestion().getQuestionsId();
         historyReponse =historyMapper.toHistoryReponse(history);
-        historyReponse.setQuestionid(questionId);
+        historyReponse.setQuestionId(questionId);
 
         historyReponses.add(historyReponse);
     }

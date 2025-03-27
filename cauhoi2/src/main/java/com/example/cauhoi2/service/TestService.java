@@ -1,11 +1,5 @@
 package com.example.cauhoi2.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.stereotype.Service;
-
 import com.example.cauhoi2.dto.request.TestRequest;
 import com.example.cauhoi2.dto.response.TestResponse;
 import com.example.cauhoi2.entity.Clasz;
@@ -18,10 +12,14 @@ import com.example.cauhoi2.mapper.TestMapper;
 import com.example.cauhoi2.repository.HistoryRepository;
 import com.example.cauhoi2.repository.QuestionRepository;
 import com.example.cauhoi2.repository.TestRepository;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,7 @@ public class TestService {
     QuestionRepository QuestionRepository;
     TestMapper testMapper;
     HistoryRepository historyRepository;
-    public TestResponse creaTest(TestRequest request, String id) {
+    public TestResponse createTest(TestRequest request, String id) {
         Test test = testMapper.toTest(request);
         Clasz clasz = new Clasz();
         clasz.setClassId(id);

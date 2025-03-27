@@ -1,31 +1,30 @@
 package com.example.cauhoi2.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.example.cauhoi2.entity.Clasz;
-import org.springframework.stereotype.Service;
-
 import com.example.cauhoi2.dto.request.ClassCreationRequest;
 import com.example.cauhoi2.dto.request.ClassUpdateRequest;
 import com.example.cauhoi2.dto.response.ClassResponse;
 import com.example.cauhoi2.dto.response.UserOfClassResponse;
-import com.example.cauhoi2.repository.ClassRepository;
-import com.example.cauhoi2.repository.UserClassRoleRepository;
-import com.example.cauhoi2.repository.UserRepository;
+import com.example.cauhoi2.entity.Clasz;
 import com.example.cauhoi2.entity.User;
 import com.example.cauhoi2.entity.UserClassRole;
 import com.example.cauhoi2.exception.AppException;
 import com.example.cauhoi2.exception.ErrorCode;
 import com.example.cauhoi2.mapper.ClassMapper;
 import com.example.cauhoi2.mapper.UserMapper;
-
+import com.example.cauhoi2.repository.ClassRepository;
+import com.example.cauhoi2.repository.UserClassRoleRepository;
+import com.example.cauhoi2.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,7 +36,6 @@ public class ClassService {
     ClassMapper classMapper;
     UserMapper userMapper;
     public ClassResponse createClass( ClassCreationRequest request, String id){
-
         Clasz clasz = classMapper.toClass(request);
         UserClassRole userClassRole = new UserClassRole();
 
@@ -50,11 +48,20 @@ public class ClassService {
 
         return classMapper.toClassResponse(clasz);
     }
+    public List<ClassResponse> getMyClasses() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return classRepository
+            .findClassesByUserUsername(username)
+            .stream()
+            .map(classMapper::toClassResponse)
+            .toList();
+    }
     public List<ClassResponse> getclass(){
 
         return classMapper.toListClassResponse(classRepository.findAll());
     }
-   public List<ClassResponse> getclassbyid(String userid) {
+   public List<ClassResponse> getClassByUserId(String userid) {
     // Lấy danh sách Class_id
     List<String> classIds = userClassRoleRepository.findByIdAndDeleteNotTrue(userid);
 
@@ -87,12 +94,12 @@ public class ClassService {
             Long memberCount = classMemberCount.getOrDefault(clasz.getClassId(), 0L);
 
             return ClassResponse.builder()
-                .classid(clasz.getClassId())
+                .classId(clasz.getClassId())
                 .name(clasz.getName())
-                .imageclass(clasz.getImageClass())
+                .imageClass(clasz.getImageClass())
                 .role(role)
-                .isdelete(clasz.getIsDelete() != null ? clasz.getIsDelete() : false)
-                .soluongthanhvien(memberCount.toString()) // Thêm số lượng thành viên vào ClassResponse
+                .isDelete(clasz.getIsDelete() != null ? clasz.getIsDelete() : false)
+                .soLuongThanhVien(memberCount.toString()) // Thêm số lượng thành viên vào ClassResponse
                 .build();
         })
         .collect(Collectors.toList());
