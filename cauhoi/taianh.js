@@ -9,7 +9,8 @@ app.use(cors()); // Thêm CORS để cho phép từ frontend
 
 const upload = multer();
 
-const IMGUR_CLIENT_ID = "3a1a1c2b22db379"; // Thay bằng Client ID của bạn
+const IMGUR_CLIENT_ID = "546c25a59c58ad7"; // Thay bằng Client ID của bạn
+const ALBUM_ID = "GkwPKSn";
 
 app.post("/upload", upload.single("image"), async (req, res) => {
     try {
