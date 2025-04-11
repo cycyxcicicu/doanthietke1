@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Taobaikiemtra from '../pages/CreateQuiz'
 import { FaShareAlt } from 'react-icons/fa';
 const Card = ({ name, soluongthanhvien, image_class, class_id,role ,onEdit, onDelete}) => {
 	

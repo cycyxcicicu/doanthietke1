@@ -1,25 +1,25 @@
 package com.example.cauhoi2.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.example.cauhoi2.entity.Category;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import jakarta.persistence.Column;
+import jakarta.persistence.OneToMany;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class TestResponse {
-    String testId;
+public class CourseResponse {
+    String id;
+    Integer stt;
     String name;
-    String imageTest;
-    int thoiGian;
-    List<QuestionResponse> questions;
-    Boolean trangThai;
+    Date timeCreate;
 }

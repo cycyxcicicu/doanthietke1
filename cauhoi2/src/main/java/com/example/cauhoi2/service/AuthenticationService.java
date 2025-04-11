@@ -3,7 +3,7 @@ package com.example.cauhoi2.service;
 import com.example.cauhoi2.dto.request.AuthenticationRequest;
 import com.example.cauhoi2.dto.request.IntrospectRequest;
 import com.example.cauhoi2.dto.request.RefreshRequest;
-import com.example.cauhoi2.dto.response.AuthenticationResponse;
+import com.example.cauhoi2.dto.response.LoginResponse;
 import com.example.cauhoi2.dto.response.IntrospectResponse;
 import com.example.cauhoi2.entity.InvalidedToken;
 import com.example.cauhoi2.entity.User;
@@ -39,7 +39,7 @@ public class AuthenticationService {
     @NonFinal
     @Value("${jwt.signerKey}")
     protected  String sign_key;
-    public AuthenticationResponse authenticate(AuthenticationRequest request)
+    public LoginResponse authenticate(AuthenticationRequest request)
     {
         var user = userRepository.findByUsername(request.getUsername()).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_EXISTED));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
@@ -47,9 +47,8 @@ public class AuthenticationService {
         if(!isMatchPassword)
             throw new AppException(ErrorCode.PASSWORD_INCORRECT);
         var token = generateToken(user);
-        return AuthenticationResponse.builder()
+        return LoginResponse.builder()
             .token(token)
-            .authenticated(true)
             .build();
     }
     private String generateToken(User user){
@@ -64,7 +63,7 @@ public class AuthenticationService {
                 )
             )
             .jwtID(UUID.randomUUID().toString())
-            .claim("userid",user.getUserId())
+            .claim("userid",user.getId())
             .build();
         Payload payload= new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);
@@ -111,7 +110,7 @@ public class AuthenticationService {
 
         return signedJWT;
     }
-    public AuthenticationResponse refreshToken(RefreshRequest request) throws JOSEException, ParseException{
+    public LoginResponse refreshToken(RefreshRequest request) throws JOSEException, ParseException{
         // Xác thực và kiểm tra token hiện tại
         var signJwt = verifyToken(request.getToken());
 
@@ -137,15 +136,13 @@ public class AuthenticationService {
             // Tạo token mới và trả về
             String newToken = generateToken(user);
 
-            return AuthenticationResponse.builder()
+            return LoginResponse.builder()
                 .token(newToken)
-                .authenticated(true)
                 .build();
         } else {
             // Nếu token vẫn còn hiệu lực, trả về token cũ
-            return AuthenticationResponse.builder()
-                .token(request.getToken())  // Trả lại token cũ
-                .authenticated(true)
+            return LoginResponse.builder()
+                .token(request.getToken())
                 .build();
         }
     }

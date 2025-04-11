@@ -2,26 +2,17 @@ import axiosInstance from "../instances/axiosInstance";
 
 // Login API
 export const login = async (username, password) => {
-    console.log("login")
     try {
-        const response = await axiosInstance.post(`/auth/token`, 
+        const response = await axiosInstance.post(`/auth/login`, 
             { username, password }
         );
-  
-        if (response.status !== 200) 
-            throw new Error(response.data.message || 'Login failed');
-  
-        const { token, authenticated } = response.data.result;
-      
-        return { token, authenticated };
-    } catch (error) {
-        if (error.response) {
-            // Lấy thông tin từ phản hồi lỗi
-            const { message, code } = error.response.data;
-      
-            return { message, code };
-        }
-    }
+
+        console.log(response)
+
+        const { token } = response.data.result;
+
+        return { token };
+    } catch {}
 };
 export const logout = async () => {
     try {

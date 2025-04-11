@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import{Taotaikhoan} from '../apiService'
-import { toast } from "react-toastify";
-import { ToastContainer } from "react-toastify";
+import{Taotaikhoan} from '../services/UserService';
 import { Link, useNavigate } from 'react-router-dom';
 import { isTokenValid } from '../utils/utils';
 function Dangki() {
@@ -45,54 +43,10 @@ function Dangki() {
       setErrorMessages(errors);
       return;
     }
+    const {message, code } = await Taotaikhoan(username, password, nickname);
 
-    // Gọi API đăng ký tài khoản
-    try {
-      const {message, code } = await Taotaikhoan(username, password, nickname);
-
-      if (code === 1000) {
- 		navigate('/dangnhap');
-        toast.success(message, {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-
-      } else if (code === 1002) {
-        toast.error('Username đã có người sử dụng', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-      }else if (code === 1004) {
-        toast.error('Password phải lớn hơn 8 kí tự', {
-          position: 'top-right',
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-      }else {
-		// Nếu response không hợp lệ, ném lỗi
-		throw new Error("Dữ liệu trả về không hợp lệ hoặc thiếu thông tin.");
-	  }
-    } catch (error) {
-      console.error('Đăng ký thất bại:', error);
-      toast.error('Có lỗi xảy ra, vui lòng thử lại!', {
-        position: 'top-right',
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+    if (code === 1000) {
+      navigate('/dangnhap');
     }
   };
 
@@ -105,7 +59,6 @@ function Dangki() {
           <Link to="/dangnhap" className="bg-white text-purple-900 py-1 px-4 rounded">Đăng Nhập</Link>
         </div>
       </header>
-	  <ToastContainer />
       {/* Main Container */}
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg mx-auto lg:max-w-4xl lg:flex">
         {/* Form Section */}

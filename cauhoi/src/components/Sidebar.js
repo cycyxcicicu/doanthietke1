@@ -70,7 +70,6 @@ const Sidebar = ({ isExpanded, toggleSidebar, activeItem, setActiveItem }) => {
               </div>
             </button>
           ) : (
-            // Xử lý các nút khác như Khám phá, Các lớp học, Cài đặt
             <button
               key={item.id}
               className={`w-full flex items-center p-2 rounded-lg ${

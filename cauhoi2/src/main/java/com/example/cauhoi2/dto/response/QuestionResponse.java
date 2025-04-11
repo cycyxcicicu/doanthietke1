@@ -4,17 +4,19 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import java.util.List;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level=AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class QuestionResponse {
-    String questionsId;
+    String id;
     String content;
-    String answer;
-    String choive;
-    boolean delete;
+    List<String> answers;
+    List<Integer> choices;
+    Integer countAnswer;
+    String level;
+    String categoryId;
 }

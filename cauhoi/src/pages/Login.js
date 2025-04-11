@@ -1,11 +1,10 @@
 import React, { useState ,useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../services/AuthService';
-import { laylaimatkhau } from '../services/UserService';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { jwtDecode } from 'jwt-decode';
 import { isTokenValid } from '../utils/utils';
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from 'react-toastify';
 function Login() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -24,11 +23,6 @@ function Login() {
 
     checkToken();
   }, [navigate]);
-
-  const quenmatkhau=()=>{
-    setErrorMessages({});
-    setShowResetPassword(true)
-  }
   const quaylaitrangdangnhap = () => {
     setErrorMessages({});
     setShowResetPassword(false)
@@ -54,24 +48,23 @@ function Login() {
       setErrorMessages(errors);
       return;
     }
-
     try {
-      const { token, authenticated } = await login(username, password);
-      console.log(token, authenticated)
-      if (authenticated) {
-        
-        const decodedToken = jwtDecode(token);
-        
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('userid', decodedToken.userid);
-        navigate('/trangchu', { replace: true });
-      } else {
-        setErrorMessages({ password: 'Tài khoản hoặc mật khẩu sai' });
-      }
-    } catch (error) {
-      console.log(error)
-      setErrorMessages({ password: error.response?.data?.message || 'Tài khoản hoặc mật khẩu không chính xác' });
-    }
+      const { token } = await login(username, password);   
+      toast.success("Đăng nhập thành công", {
+        position: 'top-right',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      console.log(token)
+      const decodedToken = jwtDecode(token);
+      
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('userid', decodedToken.userid);
+      navigate('/trangchu', { replace: true });
+    } catch {}
   };
 
   const handleResetPassword = async (e) => {
@@ -91,58 +84,6 @@ function Login() {
       setErrorMessages({ confirmPassword: 'Mật khẩu xác nhận không khớp' });
       return;
     }
-
-    try {
-      const { message, code } = await laylaimatkhau(username, newPassword);
-     if (code === 1000) {
-			
-			setShowResetPassword(false);
-			 toast.success(message, {
-			   position: 'top-right',
-			   autoClose: 5000,
-			   hideProgressBar: false,
-			   closeOnClick: true,
-			   pauseOnHover: true,
-			   draggable: true,
-			 });
-
-		   }
-		else if(code === 1004)
-		{
-			toast.error(message, {
-				position: 'top-right',
-				autoClose: 5000,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				draggable: true,
-			  });
-		}
-		else if(code === 1005)
-			{
-				toast.error(message, {
-					position: 'top-right',
-					autoClose: 5000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-				  });
-			}
-		setShowPassword2(false);
-		setShowPassword1(false);
-     
-    } catch (error) {
-      console.error('Đăng ký thất bại:', error);
-			toast.error('Có lỗi xảy ra, vui lòng thử lại!', {
-			  position: 'top-right',
-			  autoClose: 5000,
-			  hideProgressBar: false,
-			  closeOnClick: true,
-			  pauseOnHover: true,
-			  draggable: true,
-			});
-    }
   };
 
   return (
@@ -153,7 +94,6 @@ function Login() {
           <Link to="/dangki" className="bg-white text-purple-900 py-1 px-4 rounded">Đăng Kí</Link>
         </div>
       </header>
-      <ToastContainer />
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg mx-auto lg:max-w-4xl lg:flex">
         <div className="lg:w-1/2 lg:p-8">
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Log in to Quizizz</h2>
@@ -192,13 +132,6 @@ function Login() {
               </div>
               <button className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition">
                 Đăng Nhập
-              </button>
-              <button
-                type="button"
-                onClick={() => quenmatkhau()}
-                className="text-purple-600 font-semibold mt-2 block text-right"
-              >
-                Quên mật khẩu?
               </button>
             </form>
           )}

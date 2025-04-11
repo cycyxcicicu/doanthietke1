@@ -1,7 +1,7 @@
 package com.example.cauhoi2.controller;
 
 import com.example.cauhoi2.dto.request.*;
-import com.example.cauhoi2.dto.response.AuthenticationResponse;
+import com.example.cauhoi2.dto.response.LoginResponse;
 import com.example.cauhoi2.dto.response.IntrospectResponse;
 import com.example.cauhoi2.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;
@@ -21,25 +21,23 @@ public class AuthenticationController {
     @Autowired
     AuthenticationService authenticationService;
 
-
-    @PostMapping("/token")
-    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
-        
+    @PostMapping("/login")
+    public ApiResponse<LoginResponse> authenticate(@RequestBody AuthenticationRequest request) {
         var result=authenticationService.authenticate(request);
-        return ApiResponse.<AuthenticationResponse>builder()
+        return ApiResponse.<LoginResponse>builder()
             .result(result)
             .build();
     }
+
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> authenticate(@RequestBody IntrospectRequest request)throws ParseException, JOSEException {
-        
         var result=authenticationService.introspect(request);
-        
         return ApiResponse.<IntrospectResponse>builder()
             .result(result)
             .code(1000)
             .build();
     }
+
     @PostMapping("/logout")
     ApiResponse<Void> Logout(@RequestHeader("Authorization") String bearerToken) throws JOSEException, ParseException{
         authenticationService.Logout(bearerToken.replace("Bearer ", "").trim());
@@ -47,10 +45,11 @@ public class AuthenticationController {
             .code(1000)
             .build();
     }
+
     @PostMapping("/refresh")
-    ApiResponse<AuthenticationResponse> refresh(@RequestBody RefreshRequest request) throws JOSEException, ParseException{
+    ApiResponse<LoginResponse> refresh(@RequestBody RefreshRequest request) throws JOSEException, ParseException{
         var result =authenticationService.refreshToken(request);
-        return ApiResponse.<AuthenticationResponse>builder()
+        return ApiResponse.<LoginResponse>builder()
             .result(result)
             .build();
     }

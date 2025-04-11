@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { API_BASE_URL } from '../configs/ApiConfig';
+import { toast } from "react-toastify";
 
 // Tạo instance của axios
 const axiosInstance = axios.create({
@@ -65,9 +66,17 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     console.log("Error:" , error)
+    toast.error(error.response.data.message, {
+      position: 'top-right',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('authToken');
-      if (['/dangnhap', '/dangky'].indexOf(item => window.location.href.startsWith(item)) !== -1)
+      if (['/dangnhap', '/dangky'].indexOf(item => window.location.pathname.startsWith(item)) !== -1)
         return;
       window.location.href = '/dangnhap'
     }

@@ -28,9 +28,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping
-    public ApiResponse<User> createuser (@RequestBody @Valid UserCreateRequest request) {
-        
+    @PostMapping("/create")
+    public ApiResponse<User> createUser(@RequestBody @Valid UserCreateRequest request) {
         ApiResponse<User> apiResponse = new ApiResponse<>();
         userService.createUser(request);
         apiResponse.setMessage("Đăng kí thành công");

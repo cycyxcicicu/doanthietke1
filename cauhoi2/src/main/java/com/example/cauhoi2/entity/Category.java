@@ -1,39 +1,33 @@
 package com.example.cauhoi2.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.util.Date;
 import java.util.List;
+
 @Entity
-@Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Question {
+public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String content;
-    @ElementCollection
-    List<String> answers;
-    @ElementCollection
-    List<Integer> choices;
-    @ElementCollection
-    List<String> images;
-    Integer countAnswer;
-    @Enumerated(EnumType.STRING)
-    LevelQuestion level;
+    Integer stt;
+    @Column(nullable = false, unique = true)
+    String name;
+    Date timeCreate;
     @Builder.Default
     Boolean isDeleted = false;
+    @OneToMany(mappedBy = "category")
+    List<Question> questions;
     @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id")
-    Category category;
-    Date timeCreate;
+    @JoinColumn(name = "course_id")
+    Course course;
     @PrePersist
     void onCreate() {
         timeCreate = new Date();

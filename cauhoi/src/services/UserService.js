@@ -43,34 +43,3 @@ export const Taotaikhoan= async(username,password,nickname)=>{
         }
     }
 }
-  export const laylaimatkhau = async (username, password) => {
-	try {
-	  // Gửi yêu cầu PUT
-	  const response = await axiosInstance.put(`/users`, {
-		username,
-		password,
-	  });
-  
-	  // Kiểm tra nếu response và response.data tồn tại và có cấu trúc đúng
-	  if (response && response.data) {
-		const { message, code } = response.data;
-		return { message, code };
-	  } else {
-		throw new Error("Dữ liệu trả về từ API không hợp lệ");
-	  }
-	} catch (error) {
-	  // Kiểm tra nếu có lỗi trong phản hồi
-	  if (error.response) {
-		const { message, code } = error.response.data || {}; // Cố gắng lấy message và code nếu có
-		return { message, code };
-	  } else if (error.request) {
-		// Xử lý nếu không nhận được phản hồi từ server
-		console.error("No response received:", error.request);
-		throw new Error("Không nhận được phản hồi từ server");
-	  } else {
-		// Xử lý các lỗi khác
-		console.error("Error during request setup:", error.message);
-		throw new Error(error.message || "Đã có lỗi xảy ra");
-	  }
-	}
-  };

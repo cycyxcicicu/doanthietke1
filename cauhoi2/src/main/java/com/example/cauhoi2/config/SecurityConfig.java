@@ -15,7 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
-    private final String []PUBLIC_URLS = {"/auth/token", "/auth/logout"};
+    private final String []PUBLIC_URLS = {"/auth/login", "/auth/logout", "/users/create"};
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
     @Bean

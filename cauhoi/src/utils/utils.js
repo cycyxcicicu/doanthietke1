@@ -1,5 +1,4 @@
 import { jwtDecode } from 'jwt-decode';
-import { verifyToken } from '../apiService';// Hàm lấy thời hạn token từ JWT
 export const getTokenExpiration = (token) => {
   try {
     const decoded = jwtDecode(token);
