@@ -1,6 +1,7 @@
 package com.example.cauhoi2.mapper;
 
 import com.example.cauhoi2.dto.request.QuestionRequest;
+import com.example.cauhoi2.dto.request.QuestionUpdateRequest;
 import com.example.cauhoi2.dto.response.QuestionResponse;
 import com.example.cauhoi2.entity.Question;
 import org.mapstruct.Mapper;
@@ -12,6 +13,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface QuestionMapper {
     Question toQuestion(QuestionRequest request);
+    Question toQuestion(QuestionUpdateRequest request);
+    
     void toUpdateQuestion(@MappingTarget Question question, QuestionRequest request);
     @Mapping(target = "categoryId", source = "question.category.id")
     QuestionResponse toQuestionResponse(Question question);

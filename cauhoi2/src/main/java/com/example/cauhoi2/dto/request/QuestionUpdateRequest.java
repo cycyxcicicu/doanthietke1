@@ -4,7 +4,12 @@ import java.util.List;
 
 import com.example.cauhoi2.entity.LevelQuestion;
 
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -12,7 +17,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level=AccessLevel.PRIVATE)
-public class QuestionRequest {
+public class QuestionUpdateRequest {
+    @NotBlank
+    String id;
     String content;
     List<Integer> choices;
     LevelQuestion level;
