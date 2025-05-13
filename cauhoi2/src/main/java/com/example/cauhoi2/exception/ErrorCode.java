@@ -25,7 +25,8 @@ public enum ErrorCode {
     PASSWORD_INCORRECT(1007, "Password incorrect", HttpStatus.BAD_REQUEST),
     COURSE_NOT_FOUND(1008, "Course not found", HttpStatus.BAD_REQUEST),
     COURSE_EXISTED(1009, "Course existed", HttpStatus.BAD_REQUEST),
-    CATEGORY_EXISTED(1010, "Course existed", HttpStatus.BAD_REQUEST)
+    CATEGORY_EXISTED(1010, "Course existed", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_FOUND(1011, "Category not found", HttpStatus.BAD_REQUEST),
     ;
     ErrorCode(int code, String message, HttpStatus httpStatusCode) {
         this.code = code;

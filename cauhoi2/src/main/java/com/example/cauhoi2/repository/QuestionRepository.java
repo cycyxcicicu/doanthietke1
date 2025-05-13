@@ -10,7 +10,8 @@ import java.util.List;
 
 @Repository
 public interface QuestionRepository extends JpaRepository<Question,String> {
-    List<Question> findByCategoryId(String categoryId);
-    @Query("SELECT q FROM Question q WHERE q.category.course.id = :course_id ORDER BY q.category.name")
+    @Query("SELECT q FROM Question q WHERE q.category.id = :category_id AND q.isDeleted = false")
+    List<Question> findByCategoryId(@Param("category_id") String categoryId);
+    @Query("SELECT q FROM Question q WHERE q.category.course.id = :course_id AND q.isDeleted = false ORDER BY q.category.name")
     List<Question> findByCourseId(@Param("course_id") String courseId);
 }

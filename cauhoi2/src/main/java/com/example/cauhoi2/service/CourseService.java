@@ -25,38 +25,43 @@ public class CourseService {
     CourseRepository courseRepository;
     UserRepository userRepository;
     CourseMapper courseMapper;
+
     public List<CourseResponse> getCourses() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         var list = courseRepository.findAllByUserId(user.getId()).stream().toList();
         return courseMapper.toListCoursesResponse(list);
     }
+
     public CourseResponse getCourse(String id) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         var course = courseRepository
-            .findById(id)
-            .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
+                .findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.COURSE_NOT_FOUND));
         if (!course.getUser().getId().equals(user.getId()))
             throw new AppException(ErrorCode.UNAUTHORIZED);
         return courseMapper.toCourseResponse(course);
     }
+
     public CourseResponse create(CourseCreateRequest request) {
+
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-        try {
-            var countCourse = courseRepository.findAllByUserId(user.getId()).stream().toList().size();
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        
+            var countCourse = courseRepository.findAllByUserId(user.getId()).size();
+            if (courseRepository.findAllByUserId(user.getId()).stream().anyMatch(course -> course.getName().equals(request.getName()))) {
+                throw new AppException(ErrorCode.COURSE_EXISTED);
+            }
             Course newCourse = courseMapper.toCourse(request);
             newCourse.setUser(user);
             newCourse.setStt(countCourse + 1);
             newCourse = courseRepository.save(newCourse);
             return courseMapper.toCourseResponse(newCourse);
-        } catch (DataIntegrityViolationException e) {
-            throw new AppException(ErrorCode.COURSE_EXISTED);
-        }
+
     }
-    
+
 }

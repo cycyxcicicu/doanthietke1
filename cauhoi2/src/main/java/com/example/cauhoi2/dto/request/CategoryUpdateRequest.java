@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class CategoryRequest {
+public class CategoryUpdateRequest {
+    String id;
     @NotBlank(message = "Tên danh mục không được để trống")
     String name;
     @NotBlank

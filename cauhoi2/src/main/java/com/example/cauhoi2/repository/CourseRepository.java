@@ -6,12 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, String> {
+    boolean existsByName(String name);
+    Optional<Course> findByName(String name);
     @Query("SELECT c FROM Course c WHERE c.isDeleted != TRUE AND c.user.id = :user_id")
-    Optional<Course> findAllByUserId(@Param("user_id") String userId);
+    List<Course> findAllByUserId(@Param("user_id") String userId);
     @Query("SELECT c FROM Course c WHERE c.isDeleted != TRUE AND c.id = :course_id")
     Optional<Course> findById(@Param("course_id") String id);
 }

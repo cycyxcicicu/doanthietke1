@@ -3,7 +3,7 @@ package com.example.cauhoi2.controller;
 import com.example.cauhoi2.dto.request.ApiResponse;
 import com.example.cauhoi2.dto.request.QuestionRequest;
 import com.example.cauhoi2.dto.request.QuestionUpdateRequest;
-import com.example.cauhoi2.dto.request.UserCreateRequest;
+
 import com.example.cauhoi2.dto.response.QuestionResponse;
 import com.example.cauhoi2.service.QuestionService;
 

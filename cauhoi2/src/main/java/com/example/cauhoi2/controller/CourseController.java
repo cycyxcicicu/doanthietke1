@@ -38,7 +38,7 @@ public class CourseController {
             .result(courseService.create(request))
             .build();
     }
-    @PutMapping("/edit")
+    @PutMapping("/update")
     public ApiResponse<?> editSource() {
         return ApiResponse
             .builder().build();

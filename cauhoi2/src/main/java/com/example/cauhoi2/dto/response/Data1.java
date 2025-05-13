@@ -1,13 +1,17 @@
 package com.example.cauhoi2.dto.response;
 
-import lombok.*;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-@lombok.Data
 @AllArgsConstructor
 @NoArgsConstructor
+@lombok.Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class IntrospectResponse {
-    boolean valid;
+public class Data1 {
+    String link;
 }

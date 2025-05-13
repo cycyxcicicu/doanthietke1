@@ -18,7 +18,7 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     Integer stt;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     String name;
     Date timeCreate;
     @Builder.Default
