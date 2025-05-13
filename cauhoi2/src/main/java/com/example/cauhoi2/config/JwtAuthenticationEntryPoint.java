@@ -1,6 +1,6 @@
 package com.example.cauhoi2.config;
 
-import com.example.cauhoi2.dto.request.ApiResponse;
+import com.example.cauhoi2.dto.response.ApiResponse;
 import com.example.cauhoi2.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;

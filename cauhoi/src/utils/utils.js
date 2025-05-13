@@ -10,9 +10,10 @@ export const getTokenExpiration = (token) => {
 };
 
 // Hàm kiểm tra token có hợp lệ không
-export const isTokenValid = async () => {
+export const isTokenValid = () => {
+	//return true;
 	const token = localStorage.getItem('authToken');
-	console.log(token)
+	
 	if (!token) {
 		return false; // Token không tồn tại
 	}
@@ -28,5 +29,10 @@ export const isTokenValid = async () => {
 };
   
 export const userId = () => {
+	// return "thuong";
 	return localStorage.getItem('userid');
 };
+
+export const getFirstAnswer = (index) => {
+	return String.fromCharCode('A'.charCodeAt(0) + index);
+}

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 
 const SettingsPage = () => {
+  // set title cho trang
+  document.title = "Cài đặt";
   const [email, setEmail] = useState("heleo");
-  
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 

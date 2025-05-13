@@ -2,17 +2,13 @@ import axiosInstance from "../instances/axiosInstance";
 
 // Login API
 export const login = async (username, password) => {
-    try {
-        const response = await axiosInstance.post(`/auth/login`, 
-            { username, password }
-        );
+    const response = await axiosInstance.post(`/auth/login`, 
+        { username, password }
+    );
 
-        console.log(response)
+    const { token } = response.data.result;
 
-        const { token } = response.data.result;
-
-        return { token };
-    } catch {}
+    return { token };
 };
 export const logout = async () => {
     try {

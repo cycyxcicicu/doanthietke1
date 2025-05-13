@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import{Taotaikhoan} from '../services/UserService';
+import { Taotaikhoan } from '../../services/UserService';
 import { Link, useNavigate } from 'react-router-dom';
-import { isTokenValid } from '../utils/utils';
+import { isTokenValid } from '../../utils/utils';
 function Dangki() {
+  // set title cho trang
+  document.title = "Đăng kí";
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessages, setErrorMessages] = useState({});
   const navigate = useNavigate(); // Hook dùng để điều hướng trang
@@ -32,7 +34,7 @@ function Dangki() {
   // Hàm xử lý khi người dùng nhấn đăng ký
   const handledangki = async (e) => {
     e.preventDefault();
-	setErrorMessages({});
+    setErrorMessages({});
     const nickname = e.target.nickname.value.trim();
     const username = e.target.username.value.trim();
     const password = e.target.password.value.trim();
@@ -43,11 +45,11 @@ function Dangki() {
       setErrorMessages(errors);
       return;
     }
-    const {message, code } = await Taotaikhoan(username, password, nickname);
 
-    if (code === 1000) {
+    try {
+      await Taotaikhoan(username, password, nickname);
       navigate('/dangnhap');
-    }
+    } catch {}
   };
 
   return (
@@ -63,8 +65,13 @@ function Dangki() {
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg mx-auto lg:max-w-4xl lg:flex">
         {/* Form Section */}
         <div className="lg:w-1/2 lg:p-8">
+          <button className='text-black flex flex-row hover:opacity-75'
+            onClick={() => {window.location.href = "/dangnhap"}}
+            >
+            <span className='material-icons'>keyboard_backspace</span>
+          </button>
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Welcome to Quizizz</h2>
-          
+
           {/* Registration Form */}
           <form className="space-y-4" onSubmit={handledangki}>
             <div>

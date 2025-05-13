@@ -23,8 +23,8 @@ public class Question {
     List<String> answers;
     @ElementCollection
     List<Integer> choices;
-    @ElementCollection
-    List<String> images;
+    @OneToMany
+    List<Image> images;
     Integer countAnswer;
     @Enumerated(EnumType.STRING)
     LevelQuestion level;

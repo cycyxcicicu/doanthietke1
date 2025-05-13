@@ -1,7 +1,7 @@
 package com.example.cauhoi2.controller;
 
 
-import com.example.cauhoi2.dto.request.ApiResponse;
+import com.example.cauhoi2.dto.response.ApiResponse;
 import com.example.cauhoi2.dto.request.CourseCreateRequest;
 import com.example.cauhoi2.dto.response.CourseResponse;
 import com.example.cauhoi2.service.CourseService;

@@ -2,8 +2,10 @@ import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { API_BASE_URL } from '../configs/ApiConfig';
 import { toast } from "react-toastify";
-
+import { showError } from '../utils/toast';
+import { setGlobalLoading } from "../controller/LoadingController";
 // Tạo instance của axios
+let activeRequests = 0;
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL, // Đổi base URL của API theo backend của bạn
   headers: {
@@ -14,6 +16,8 @@ const axiosInstance = axios.create({
 // Thêm interceptor vào request để kiểm tra và làm mới token nếu cần
 axiosInstance.interceptors.request.use(
   async (config) => {
+    if (activeRequests++ === 0)
+      setGlobalLoading(true);
     console.log("sendrequest")
     const token = localStorage.getItem('authToken');
     if (token ) {
@@ -63,22 +67,21 @@ axiosInstance.interceptors.request.use(
 
 // Interceptor response: bắt lỗi 401
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    setGlobalLoading(false); 
+    activeRequests = 0;
+    return response
+  },
   (error) => {
+    setGlobalLoading(false);
+    activeRequests = 0;
     console.log("Error:" , error)
-    toast.error(error.response.data.message, {
-      position: 'top-right',
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
+    showError(error.response.data.message);
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('authToken');
-      if (['/dangnhap', '/dangky'].indexOf(item => window.location.pathname.startsWith(item)) !== -1)
-        return;
-      window.location.href = '/dangnhap'
+      console.log(window.location.pathname)
+      if (['/dangnhap', '/dangki'].findIndex(item => window.location.pathname.startsWith(item)) === -1)
+        window.location.href = '/dangnhap'
     }
     return Promise.reject(error);
   }

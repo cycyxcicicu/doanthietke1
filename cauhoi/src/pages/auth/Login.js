@@ -1,11 +1,13 @@
 import React, { useState ,useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../services/AuthService';
+import { login } from '../../services/AuthService';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { jwtDecode } from 'jwt-decode';
-import { isTokenValid } from '../utils/utils';
+import { isTokenValid } from '../../utils/utils';
 import { toast } from 'react-toastify';
 function Login() {
+  // set title cho trang
+  document.title = "Đăng nhập";
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showPassword1, setShowPassword1] = useState(false);
@@ -96,6 +98,11 @@ function Login() {
       </header>
       <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-lg mx-auto lg:max-w-4xl lg:flex">
         <div className="lg:w-1/2 lg:p-8">
+          <button className='text-black flex flex-row hover:opacity-75'
+            onClick={() => {window.location.href = "/"}}
+            >
+            <span className='material-icons'>keyboard_backspace</span>
+          </button>
           <h2 className="text-2xl font-semibold mb-4 text-gray-800">Log in to Quizizz</h2>
 
           {!showResetPassword && (

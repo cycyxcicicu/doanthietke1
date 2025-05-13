@@ -1,4 +1,4 @@
-package com.example.cauhoi2.dto.request;
+package com.example.cauhoi2.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;

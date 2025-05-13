@@ -15,13 +15,13 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 public class SecurityConfig {
-    private final String []PUBLIC_URLS = {"/auth/login", "/auth/logout", "/users/create"};
+    private final String []PUBLIC_URLS = {"/auth/login", "/auth/logout", "/users/create", "/read-file/**", "/exam-free/**", "/images/**"};
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-            .authorizeHttpRequests(request -> request.requestMatchers(HttpMethod.POST, PUBLIC_URLS)
+            .authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_URLS)
                 .permitAll()
                 .anyRequest()
                 .authenticated());

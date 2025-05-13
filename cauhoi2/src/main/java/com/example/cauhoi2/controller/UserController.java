@@ -1,6 +1,6 @@
 package com.example.cauhoi2.controller;
 
-import com.example.cauhoi2.dto.request.ApiResponse;
+import com.example.cauhoi2.dto.response.ApiResponse;
 import com.example.cauhoi2.dto.request.UserCreateRequest;
 import com.example.cauhoi2.dto.request.UserUpdateRequest;
 import com.example.cauhoi2.dto.request.UserUpdatepasswordRequest;
