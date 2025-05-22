@@ -18,8 +18,5 @@ public class Image {
     String id;
     @Column(nullable = false)
     String link;
-    @Column(nullable = false)
-    String deletehash;
-
     int stt;
 }

@@ -1,6 +1,6 @@
 package com.example.cauhoi2.repository;
 
-import com.example.cauhoi2.entity.file_data.Exam;
+import com.example.cauhoi2.entity.Exam;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

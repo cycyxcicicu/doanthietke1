@@ -1,72 +1,87 @@
 package com.example.cauhoi2.service;
 
+import com.example.cauhoi2.dto.response.DescriptionResponse;
+import com.example.cauhoi2.dto.response.ExamResponse;
+import com.example.cauhoi2.dto.response.GroupResponse;
+import com.example.cauhoi2.dto.response.RunPartResponse;
+import com.example.cauhoi2.entity.Exam;
+import com.example.cauhoi2.entity.Group;
+import com.example.cauhoi2.entity.RunPart;
+import com.example.cauhoi2.strategy.ExamMix;
+import com.example.cauhoi2.util.Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.docx4j.wml.P;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Marshaller;
-
-import java.io.InputStream;
-import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class MixService {
+    final ExamMix examMix;
+    public List<ExamResponse> mix(ExamResponse exam, int count) {
+        List<ExamResponse> exams = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            ExamResponse examRes = examMix.mix(exam);
+            mapping(examRes);
+            exams.add(examRes);
+        }
+        return exams;
+    }
 
-    /**
-     * Đọc file Word (.docx) và trích xuất toàn bộ phần XML nội dung chính
-     */
-    public String extractXmlFromDocx(MultipartFile file) {
-        try {
-            // Đọc tài liệu DOCX từ MultipartFile
-            InputStream inputStream = file.getInputStream();
-            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(inputStream);
+    private void mapping(ExamResponse exam) {
+        int sttQuestion = 1;
+        for (GroupResponse group : exam.getGroups()) {
+            if (group.getQuestions().isEmpty()) continue;
+            int countMapping = countMapping(group);
+            if (countMapping == 0 || (countMapping != 2 && countMapping != group.getQuestions().size() && countMapping != 2 + group.getQuestions().size())) {
+                sttQuestion += group.getQuestions().size();
+                continue;
+            }
+            List<Integer> listReplace = getListReplace(group, countMapping, sttQuestion);
+            replace(group, listReplace);
+            sttQuestion += group.getQuestions().size();
+        }
+    }
 
-            // Lấy phần chính của tài liệu
-            MainDocumentPart mainDocumentPart = wordMLPackage.getMainDocumentPart();
+    private static List<Integer> getListReplace(GroupResponse group, int countMapping, int sttQuestion) {
+        List<Integer> listReplace = new LinkedList<>();
+        if (countMapping == 2 || countMapping == 2 + group.getQuestions().size()) {
+            listReplace.add(sttQuestion);
+            listReplace.add(sttQuestion + group.getQuestions().size() - 1);
+        }
+        if (countMapping == group.getQuestions().size() || countMapping == 2 + group.getQuestions().size())
+            for (int i = sttQuestion; i < sttQuestion + group.getQuestions().size(); i++) {
+                listReplace.add(i);
+            }
+        return listReplace;
+    }
 
-            // Lấy danh sách các đoạn văn trong tài liệu
-            List<Object> paragraphs = mainDocumentPart.getJaxbElement().getBody().getContent();
+    private int countMapping(GroupResponse group) {
+        if (group.getQuestions().isEmpty())
+            return -1;
+        int count = 0;
+        for (DescriptionResponse description : group.getDescriptions()) {
+            count += description.getContents().stream().mapToInt(item -> Util.countStr2InStr1(item.getText(), "{}")).sum();
+        }
+        return count;
+    }
 
-            // Tạo StringBuilder để lưu trữ XML
-            StringBuilder xmlContent = new StringBuilder();
-
-            // Duyệt qua từng đoạn văn và lấy XML của từng câu
-            for (Object obj : paragraphs) {
-                if (obj instanceof P) {
-                    P paragraph = (P) obj;
-                    // Lấy XML của đoạn văn (câu)
-                    xmlContent.append(marshalToXML(paragraph)).append("\n");
+    private void replace(GroupResponse group, List<Integer> listReplace) {
+        for (DescriptionResponse des : group.getDescriptions()) {
+            if (listReplace.isEmpty()) return;
+            for (RunPartResponse runPart : des.getContents()) {
+                if (listReplace.isEmpty()) return;
+                while (runPart.getText() != null && runPart.getText().contains("{}") && !listReplace.isEmpty()) {
+                    String text = runPart.getText();
+                    text = text.replaceFirst(Pattern.quote("{}"), listReplace.getFirst().toString());
+                    runPart.setText(text);
+                    listReplace.removeFirst();
                 }
             }
-
-            // Trả về XML của các câu
-            return xmlContent.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error extracting XML: " + e.getMessage();
         }
     }
-
-    // Hàm để chuyển đổi đối tượng P thành chuỗi XML
-    private String marshalToXML(P paragraph){
-        try {
-            // Trích xuất XML trực tiếp từ đối tượng P
-            String xml = org.docx4j.XmlUtils.marshaltoString(paragraph);
-            return xml;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error during XML extraction.";
-        }
-    }
-
 }

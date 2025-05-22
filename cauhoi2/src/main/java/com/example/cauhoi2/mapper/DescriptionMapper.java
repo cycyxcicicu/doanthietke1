@@ -1,10 +1,10 @@
 package com.example.cauhoi2.mapper;
 
-import com.example.cauhoi2.dto.response.file_data.DescriptionQuestionResponse;
-import com.example.cauhoi2.entity.file_data.DescriptionQuestion;
+import com.example.cauhoi2.dto.response.DescriptionResponse;
+import com.example.cauhoi2.entity.Description;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface DescriptionMapper {
-    DescriptionQuestionResponse toDescriptionQuestionResponse(DescriptionQuestion descriptionQuestion);
+    DescriptionResponse toDescriptionQuestionResponse(Description descriptionQuestion);
 }

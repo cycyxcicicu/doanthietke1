@@ -1,4 +1,4 @@
-package com.example.cauhoi2.dto.request.word_file;
+package com.example.cauhoi2.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

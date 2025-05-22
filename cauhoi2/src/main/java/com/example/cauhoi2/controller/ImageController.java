@@ -18,9 +18,7 @@ public class ImageController {
     ImageService imageService;
     @PostMapping("/delete-all")
     ApiResponse<?> deleteImages() {
-        for (Image image : imageService.getAllHashDelete())
-            imageService.deleteImageFromService(image.getId());
-
+        imageService.deleteImagesFromService(imageService.getAll());
         return ApiResponse.builder().code(1000).build();
     }
 }

@@ -28,7 +28,11 @@ public enum ErrorCode {
     CANNOT_READ_FILE(1010, "Cannot read data in file", HttpStatus.BAD_REQUEST),
     CANNOT_SAVE_IMAGE(1011, "Cannot save image", HttpStatus.BAD_REQUEST),
     IMAGE_NOT_EXISTED(1012, "Image not existed", HttpStatus.BAD_REQUEST),
-    EXAM_NOT_EXISTED(1013, "Exam not existed", HttpStatus.BAD_REQUEST)
+    EXAM_NOT_EXISTED(1013, "Exam not existed", HttpStatus.BAD_REQUEST),
+    IMAGE_CANNOT_REMOVE(1014, "Cannot remove image", HttpStatus.BAD_REQUEST),
+    EXIST_QUESTION_HAS_NO_ANSWER_CORRECT(1015, "Exist question has no answer correct", HttpStatus.BAD_REQUEST),
+    EXIST_QUESTION_HAS_MANY_ANSWERS_CORRECT(1016, "Exist question has many answers correct", HttpStatus.BAD_REQUEST),
+    EXIST_QUESTION_HAS_UNDER_2_ANSWER(1017, "Exist question has under 2 answer", HttpStatus.BAD_REQUEST)
     ;
     ErrorCode(int code, String message, HttpStatus httpStatusCode) {
         this.code = code;

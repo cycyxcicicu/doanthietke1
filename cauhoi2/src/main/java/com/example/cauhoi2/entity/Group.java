@@ -1,10 +1,8 @@
-package com.example.cauhoi2.entity.file_data;
+package com.example.cauhoi2.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +19,19 @@ public class Group {
 
     String name;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "group")
     @OrderBy("stt ASC")
-    List<DescriptionQuestion> items = new ArrayList<>();
+    List<Description> descriptions = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "group")
     @OrderBy("stt ASC")
     List<Question> questions = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "exam_id")
     Exam exam;
+
+    boolean isNotMix;
 
     int stt;
 }

@@ -1,11 +1,8 @@
-package com.example.cauhoi2.entity.file_data;
+package com.example.cauhoi2.entity;
 
-import com.example.cauhoi2.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,10 +20,7 @@ public class Exam {
     String name;
 
     @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "exam")
     @OrderBy("stt ASC")
     List<Group> groups = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    User user;
 }

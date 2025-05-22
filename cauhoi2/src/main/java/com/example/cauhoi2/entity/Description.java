@@ -1,10 +1,8 @@
-package com.example.cauhoi2.entity.file_data;
+package com.example.cauhoi2.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DescriptionQuestion {
+public class Description {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -24,7 +22,9 @@ public class DescriptionQuestion {
     @OrderBy("stt ASC")
     List<RunPart> contents = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "group_id")
+    Group group;
 
     int stt;
 }

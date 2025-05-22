@@ -1,66 +1,79 @@
 package com.example.cauhoi2.service;
 
-import com.example.cauhoi2.client.ImageClient;
-import com.example.cauhoi2.dto.response.ImageResponse;
-import com.example.cauhoi2.dto.response.ImageUploadResponse;
 import com.example.cauhoi2.entity.Image;
 import com.example.cauhoi2.exception.AppException;
 import com.example.cauhoi2.exception.ErrorCode;
 import com.example.cauhoi2.mapper.ImageMapper;
 import com.example.cauhoi2.repository.ImageRepository;
-import org.checkerframework.checker.units.qual.A;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class ImageService {
-    @Autowired
-    ImageClient imageClient;
+    @NonFinal
     @Value("${image-upload-service.client-id}")
     String userIdServiceImage;
-    @Autowired
     ImageMapper imageMapper;
-    @Autowired
     ImageRepository imageRepository;
-    public String saveImageToLocal(byte[] imageBytes, String fileName) {
+    public Image saveImageToLocal(byte[] imageBytes, String fileName, int stt) {
         try {
-            Path uploadPath = Paths.get("uploads");
+            Path uploadPath = Paths.get("uploads/images");
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
             Path imagePath = uploadPath.resolve(fileName);
             Files.write(imagePath, imageBytes);
-            return "/uploads/" + fileName;
+            String link = "/uploads/images/" + fileName;
+            return imageRepository.save(Image.builder().link(link).stt(stt).build());
         } catch (IOException e) {
             throw new AppException(ErrorCode.CANNOT_SAVE_IMAGE);
         }
     }
 
-    public Image saveImageToService(MultipartFile multipartFile) {
-        ImageUploadResponse response = imageClient.uploadImage("Client-ID " + userIdServiceImage, multipartFile).getData();
-        return imageRepository.save(imageMapper.toImage(response));
+    public void deleteImagesFromService(List<Image> images) {
+        String uploadDir = System.getProperty("user.dir") + "/uploads";
+
+        for (Image image : images) {
+            if (imageRepository.existsById(image.getId())) {
+                try {
+                    String fileName = image.getLink();
+
+                    Path filePath = Paths.get(uploadDir, fileName);
+
+                    // Kiểm tra file có tồn tại không
+                    if (Files.exists(filePath)) {
+                        Files.delete(filePath);
+                        log.info("Đã xóa file: ", image.getLink());
+                    } else {
+                        log.info("File không tồn tại: ", image.getLink());
+                    }
+
+                    imageRepository.delete(image);
+                } catch (IOException e) {
+                    throw new AppException(ErrorCode.IMAGE_CANNOT_REMOVE);
+                }
+            }
+        }
     }
 
-    public boolean deleteImageFromService(String id) {
-        Image image = imageRepository.findById(id)
-            .orElseThrow(() -> new AppException(ErrorCode.IMAGE_NOT_EXISTED));
-        var response = imageClient.deleteImage("Client-ID " + userIdServiceImage, image.getDeletehash());
-        //if (response.isSuccess()) {
-        //    imageRepository.delete(image);
-            return true;
-        //}
-        //return false;
-    }
-
-    public List<Image> getAllHashDelete() {
+    public List<Image> getAll() {
         return imageRepository.findAll();
     }
 }

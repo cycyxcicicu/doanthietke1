@@ -1,14 +1,12 @@
-package com.example.cauhoi2.entity.file_data;
+package com.example.cauhoi2.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "questions_file")
+@Entity(name = "questions")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,9 +20,13 @@ public class Question {
     @OrderBy("stt ASC")
     List<RunPart> contents = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question")
     @OrderBy("stt ASC")
     List<Answer> answers = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    Group group;
 
     int stt;
 }

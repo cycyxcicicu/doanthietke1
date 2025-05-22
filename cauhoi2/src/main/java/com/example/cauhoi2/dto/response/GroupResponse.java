@@ -1,4 +1,4 @@
-package com.example.cauhoi2.dto.response.file_data;
+package com.example.cauhoi2.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -15,6 +15,7 @@ import java.util.List;
 public class GroupResponse {
     String id;
     String name;
-    List<DescriptionQuestionResponse> descriptionQuestionResponses;
+    List<DescriptionResponse> descriptions;
     List<QuestionResponse> questions;
+    boolean isNotMix;
 }

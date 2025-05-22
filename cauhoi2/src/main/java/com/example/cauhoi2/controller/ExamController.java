@@ -1,7 +1,7 @@
 package com.example.cauhoi2.controller;
 
 import com.example.cauhoi2.dto.response.ApiResponse;
-import com.example.cauhoi2.dto.response.file_data.ExamResponse;
+import com.example.cauhoi2.dto.response.ExamResponse;
 import com.example.cauhoi2.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/exam-free")
-public class ExamFreeController {
+@RequestMapping("/exams")
+public class ExamController {
     @Autowired
     ExamService examService;
     @GetMapping("/{id}")

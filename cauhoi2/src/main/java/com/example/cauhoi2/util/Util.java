@@ -53,4 +53,18 @@ public class Util {
         };
     }
 
+    public static int countStr2InStr1(String str1, String str2) {
+        if (str1 == null || str1.isEmpty()) return 0;
+        if (str2 == null || str2.isEmpty()) return 0;
+        int count = 0;
+        for (int i = 0; i <= str1.length() - str2.length(); i++) {
+            for (int j = 0; j < str2.length(); j++) {
+                if (str2.charAt(j) != str1.charAt(i + j))
+                    break;
+                else if (j == str2.length() - 1)
+                    count++;
+            }
+        }
+        return count;
+    }
 }

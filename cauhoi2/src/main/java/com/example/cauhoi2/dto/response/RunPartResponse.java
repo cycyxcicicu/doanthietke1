@@ -1,6 +1,5 @@
-package com.example.cauhoi2.dto.response.file_data;
+package com.example.cauhoi2.dto.response;
 
-import com.example.cauhoi2.dto.response.ImageResponse;
 import com.example.cauhoi2.entity.RunPartType;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -25,4 +24,6 @@ public class RunPartResponse {
     boolean isInNghieng;
     boolean isEndLine;
     String maMauChu;
+    Integer width;
+    Integer height;
 }

@@ -1,11 +1,8 @@
-package com.example.cauhoi2.entity.file_data;
+package com.example.cauhoi2.entity;
 
-import com.example.cauhoi2.entity.Image;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +23,8 @@ public class RunPart {
     @OneToMany
     @OrderBy("stt ASC")
     List<Image> images = new ArrayList<>();
+
+    @Column(columnDefinition = "TEXT")
     String text;
     boolean isToDam;
     boolean isGachChan;
@@ -33,4 +32,7 @@ public class RunPart {
     boolean isEndLine;
     String maMauChu;
     int stt;
+
+    Integer width;
+    Integer height;
 }

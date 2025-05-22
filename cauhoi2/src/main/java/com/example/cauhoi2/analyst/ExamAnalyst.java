@@ -1,17 +1,16 @@
 package com.example.cauhoi2.analyst;
 
-import com.example.cauhoi2.dto.request.word_file.PartAnalyst;
-import com.example.cauhoi2.entity.Image;
-import com.example.cauhoi2.entity.file_data.*;
-import com.example.cauhoi2.mapper.ImageMapper;
+import com.example.cauhoi2.dto.request.PartAnalystRequest;
+import com.example.cauhoi2.entity.*;
 import com.example.cauhoi2.service.ImageService;
 import com.example.cauhoi2.util.ExamUtil;
-import com.example.cauhoi2.util.Util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFPicture;
 import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
+import org.openxmlformats.schemas.drawingml.x2006.main.CTTransform2D;
+import org.openxmlformats.schemas.drawingml.x2006.picture.CTPicture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,8 +22,6 @@ import java.util.List;
 public class ExamAnalyst {
     @Autowired
     ImageService imageService;
-    @Autowired
-    ImageMapper imageMapper;
     private List<Answer> analystAnswer(XWPFParagraph part) {
         List<Answer> answers = new ArrayList<>();
         for (XWPFRun run : part.getRuns()) {
@@ -61,9 +58,30 @@ public class ExamAnalyst {
                 answers.getLast().getContents().add(ExamUtil.copy(run));
             }
         }
+        for (Answer answer : answers) {
+            // Gộp các run
+            List<RunPart> newContents = new ArrayList<>();
+            RunPart now = null;
+            for (RunPart runPart : answer.getContents()) {
+                if (now == null)
+                    now = runPart;
+                else if (now.getType() == RunPartType.IMAGE) {
+                    newContents.add(now);
+                    now = runPart;
+                }
+                else if (ExamUtil.canMerge(now, runPart)) {
+                    now.setText(now.getText() + runPart.getText());
+                } else {
+                    newContents.add(now);
+                    now = runPart;
+                }
+            }
+            if (now != null) newContents.add(now);
+            answer.setContents(newContents);
+        }
         return answers;
     }
-    public Question analystQuestion(PartAnalyst part) {
+    public Question analystQuestion(PartAnalystRequest part) {
         if (!part.isQuestion()) return null;
         Question question = new Question();
         for (XWPFParagraph line : part.getValues()) {
@@ -71,9 +89,29 @@ public class ExamAnalyst {
                 List<Answer> answers = analystAnswer(line);
                 question.getAnswers().addAll(answers);
             } else {
+                XWPFRun runMerge = null;
+                RunPart runPartNow = null;
+                // Gom nhóm các run có style tương đồng để giảm thiểu không gian lưu trữ
                 for (XWPFRun run : line.getRuns()) {
-                    question.getContents().add(analystContent(run));
+                    if (runPartNow == null) {
+                        runPartNow = analystContent(run);
+                        runMerge = run;
+                    }
+                    else if (runPartNow.getType() == RunPartType.IMAGE) {
+                        question.getContents().add(runPartNow);
+                        runPartNow = analystContent(run);
+                        runMerge = run;
+                    }
+                    else if (ExamUtil.canMerge(runMerge, run))
+                        runPartNow.setText(runPartNow.getText() + run.toString());
+                    else {
+                        question.getContents().add(runPartNow);
+                        runPartNow = analystContent(run);
+                        runMerge = run;
+                    }
                 }
+                if (runPartNow != null)
+                    question.getContents().add(runPartNow);
                 //Thêm dấu xuống dòng
                 question.getContents().add(RunPart
                     .builder()
@@ -81,7 +119,44 @@ public class ExamAnalyst {
                     .build());
             }
         }
+
+        question.getContents().removeLast();
         return question;
+    }
+    public Description analystDescription(PartAnalystRequest partAnalystRequest) {
+        Description description = new Description();
+        for (XWPFParagraph partOfPart : partAnalystRequest.getValues()) {
+            // Gom nhóm các run có style tương đồng để giảm thiểu không gian lưu trữ
+            XWPFRun runMerge = null;
+            RunPart runPartNow = null;
+            for (XWPFRun run : partOfPart.getRuns()) {
+                if (runPartNow == null) {
+                    runPartNow = analystContent(run);
+                    runMerge = run;
+                }
+                else if (runPartNow.getType() == RunPartType.IMAGE) {
+                    description.getContents().add(runPartNow);
+                    runPartNow = analystContent(run);
+                    runMerge = run;
+                }
+                else if (ExamUtil.canMerge(runMerge, run))
+                    runPartNow.setText(runPartNow.getText() + run.toString());
+                else {
+                    description.getContents().add(runPartNow);
+                    runPartNow = analystContent(run);
+                    runMerge = run;
+                }
+            }
+            if (runPartNow != null)
+                description.getContents().add(runPartNow);
+            //Thêm dấu xuống dòng
+            description.getContents().add(RunPart
+                .builder()
+                .isEndLine(true)
+                .build());
+        }
+        description.getContents().removeLast();
+        return description;
     }
     public RunPart analystContent(XWPFRun run) {
         RunPart runPart = new RunPart();
@@ -97,7 +172,23 @@ public class ExamAnalyst {
 
                 // Tạo tên file duy nhất
                 String fileName = "image_" + System.currentTimeMillis() + "." + picData.suggestFileExtension();
-                runPart.getImages().add(imageService.saveImageToService(Util.createMultipartFile(imageBytes, fileName)));
+                runPart.getImages().add(imageService.saveImageToLocal(imageBytes, fileName, runPart.getImages().size()));
+
+                CTPicture ctPic = pic.getCTPicture();
+                if (ctPic != null && ctPic.getSpPr() != null && ctPic.getSpPr().getXfrm() != null) {
+                    CTTransform2D xfrm = ctPic.getSpPr().getXfrm();
+                    if (xfrm.getExt() != null) {
+                        long cx = xfrm.getExt().getCx(); // Chiều rộng (EMU)
+                        long cy = xfrm.getExt().getCy(); // Chiều cao (EMU)
+
+                        // Chuyển EMU -> pixel (1 pixel = 9525 EMU)
+                        int widthPx = (int) (cx / 9525);
+                        int heightPx = (int) (cy / 9525);
+
+                        runPart.setWidth(widthPx);
+                        runPart.setHeight(heightPx);
+                    }
+                }
             }
         }
         return runPart;

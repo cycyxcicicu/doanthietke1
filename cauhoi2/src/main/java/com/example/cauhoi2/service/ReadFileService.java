@@ -1,10 +1,9 @@
 package com.example.cauhoi2.service;
 
 import com.example.cauhoi2.analyst.ExamAnalyst;
-import com.example.cauhoi2.dto.request.word_file.GroupAnalyst;
-import com.example.cauhoi2.dto.request.word_file.PartAnalyst;
-import com.example.cauhoi2.entity.Image;
-import com.example.cauhoi2.entity.file_data.*;
+import com.example.cauhoi2.dto.request.GroupAnalystRequest;
+import com.example.cauhoi2.dto.request.PartAnalystRequest;
+import com.example.cauhoi2.entity.*;
 import com.example.cauhoi2.exception.AppException;
 import com.example.cauhoi2.exception.ErrorCode;
 import com.example.cauhoi2.repository.ExamRepository;
@@ -12,15 +11,14 @@ import com.example.cauhoi2.util.ExamUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
-import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -30,45 +28,53 @@ public class ReadFileService {
     @Autowired
     ExamRepository examRepository;
     public String readFile(MultipartFile file) {
-        List<GroupAnalyst> groupsAnalyst = new ArrayList<>();
+        List<GroupAnalystRequest> groups = parseGroupsFromFile(file);
+        Exam exam = buildExamFromGroupRequests(groups,
+            Objects.requireNonNullElse(file.getOriginalFilename(), "Exam").replace(".docx", ""));
+        examRepository.save(exam);
+        return exam.getId();
+    }
 
-        // bóc tách dữ liệu trong file
+    private List<GroupAnalystRequest> parseGroupsFromFile(MultipartFile file) {
+        List<GroupAnalystRequest> groups = new ArrayList<>();
         try {
             XWPFDocument doc = new XWPFDocument(file.getInputStream());
+            GroupAnalystRequest currentGroup = null;
 
-            GroupAnalyst groupAnalyst = null;
+            for (XWPFParagraph para : doc.getParagraphs()) {
+                String text = para.getText().trim();
+                String groupName = ExamUtil.getGroup(text);
 
-            //Gom nhóm thành từng group, gom và phân biệt từng câu hỏi, câu trả lời hay chú thích, yêu cầu, đề bài
-            for (int i = 0; i < doc.getParagraphs().size() - 1; i++) {
-                XWPFParagraph para = doc.getParagraphs().get(i);
-                String paraText = para.getText();
-                String groupName = ExamUtil.getGroup(paraText);
-                if (!groupName.equals("NONE"))
-                {
-                    if (groupAnalyst != null)
-                        groupsAnalyst.add(groupAnalyst);
-                    groupAnalyst = new GroupAnalyst();
-                    groupAnalyst.setName(groupName);
+                if (!groupName.equals("NONE")) {
+                    if (currentGroup != null) groups.add(currentGroup);
+                    currentGroup = createNewGroupRequest(groupName);
                 } else {
-                    if (groupAnalyst == null) {
-                        groupAnalyst = new GroupAnalyst();
-                        groupAnalyst.setName("NONE");
+                    if (currentGroup == null) {
+                        currentGroup = createNewGroupRequest("NONE");
                     }
-                    PartAnalyst lastPart = !groupAnalyst.getParts().isEmpty() ? groupAnalyst.getParts().getLast() : null;
-                    if (ExamUtil.isFirstQuestion(paraText)) {
-                        PartAnalyst part = new PartAnalyst();
-                        part.getValues().add(para);
+
+                    PartAnalystRequest lastPart = currentGroup.getParts().isEmpty() ? null : currentGroup.getParts().getLast();
+
+                    if (ExamUtil.isFirstQuestion(text)) {
+                        PartAnalystRequest part = new PartAnalystRequest();
                         part.setQuestion(true);
-                        groupAnalyst.getParts().add(part);
-                    } else if (lastPart != null) {
-                        if (!ExamUtil.isFirstAnswer(paraText)) {
-                            if (lastPart.isQuestion() && lastPart.isAddedAnswered()) {
-                                PartAnalyst part = new PartAnalyst();
-                                part.getValues().add(para);
-                                groupAnalyst.getParts().add(part);
-                            } else
-                                lastPart.getValues().add(para);
-                        } else {
+                        part.getValues().add(para);
+                        currentGroup.getParts().add(part);
+                    } else if (!ExamUtil.isFirstAnswer(text)) {
+                        if (lastPart != null && !lastPart.isAddedAnswered())
+                            lastPart.getValues().add(para);
+                        else {
+                            if (lastPart != null) {
+                                groups.add(currentGroup);
+                                currentGroup = createNewGroupRequest("NONE");
+                            }
+                            PartAnalystRequest part = new PartAnalystRequest();
+                            part.getValues().add(para);
+                            currentGroup.getParts().add(part);
+                        }
+                    } else {
+                        // Là câu trả lời
+                        if (lastPart != null) {
                             lastPart.getValues().add(para);
                             lastPart.setAddedAnswered(true);
                         }
@@ -76,59 +82,45 @@ public class ReadFileService {
                 }
             }
 
-            groupsAnalyst.add(groupAnalyst);
-        } catch (IOException e) {throw new AppException(ErrorCode.CANNOT_READ_FILE);}
+            if (currentGroup != null) groups.add(currentGroup);
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.CANNOT_READ_FILE);
+        }
 
-        // phân tích và lưu dữ liệu
+        return groups;
+    }
+
+    private Exam buildExamFromGroupRequests(List<GroupAnalystRequest> groups, String fileName) {
         Exam exam = new Exam();
-        exam.setName(file.getName());
-        for (GroupAnalyst groupAnalyst : groupsAnalyst) {
-            Group newGroup = new Group();
-            newGroup.setName(groupAnalyst.getName());
-            for (PartAnalyst part : groupAnalyst.getParts()) {
+        exam.setName(fileName);
+
+        int[] maxStt = {1, 1, 1, 1};
+
+        for (GroupAnalystRequest groupAnalyst : groups) {
+            Group group = createGroup(groupAnalyst, maxStt[0]++);
+            maxStt[1] = 1; // reset question stt
+            maxStt[2] = 1; // reset description stt
+
+            for (PartAnalystRequest part : groupAnalyst.getParts()) {
                 if (part.isQuestion()) {
-                    Question question = examAnalyst.analystQuestion(part);
-                    settingQuestion(question);
-                    newGroup.getQuestions().add(question);
-                }
-                else {
-                    DescriptionQuestion descriptionQuestion = new DescriptionQuestion();
-                    for (XWPFParagraph partOfPart : part.getValues()) {
-                        for (XWPFRun run : partOfPart.getRuns()) {
-                            descriptionQuestion.getContents().add(examAnalyst.analystContent(run));
-                        }
-                        //Thêm dấu xuống dòng
-                        descriptionQuestion.getContents().add(RunPart
-                            .builder()
-                            .isEndLine(true)
-                            .build());
+                    Question question = processQuestion(part, group, maxStt[1]++);
+                    maxStt[3] = 1; // reset answer stt
+                    for (Answer answer : question.getAnswers()) {
+                        answer.setQuestion(question);
+                        answer.setStt(maxStt[3]++);
+                        setSttRunPart(answer.getContents());
                     }
-                    newGroup.getItems().add(descriptionQuestion);
+                    group.getQuestions().add(question);
+                } else {
+                    Description description = processDescription(part, group, maxStt[2]++);
+                    group.getDescriptions().add(description);
                 }
             }
-            exam.getGroups().add(newGroup);
+
+            exam.getGroups().add(group);
         }
-        int maxSttGroup = 1;
-        for (Group group : exam.getGroups()) {
-            group.setStt(maxSttGroup++);
-            int maxStt = 1;
-            for (DescriptionQuestion descriptionQuestion : group.getItems()) {
-                descriptionQuestion.setStt(maxStt++);
-                setSttRunPart(descriptionQuestion.getContents());
-            }
-            maxStt = 1;
-            for (Question question : group.getQuestions()) {
-                question.setStt(maxStt++);
-                setSttRunPart(question.getContents());
-                int maxSttAnswer = 1;
-                for (Answer answer : question.getAnswers()) {
-                    answer.setStt(maxSttAnswer++);
-                    setSttRunPart(answer.getContents());
-                }
-            }
-        }
-        examRepository.save(exam);
-        return exam.getId();
+
+        return exam;
     }
 
     void setSttRunPart(List<RunPart> runParts) {
@@ -144,26 +136,36 @@ public class ReadFileService {
 
     void settingQuestion(Question question) {
         if (question == null) return;
-        Iterator<RunPart> contents = question.getContents().iterator();
-        while (contents.hasNext()) {
-            RunPart runPartFirst = contents.next();
-            if (ExamUtil.containsPunctuation(runPartFirst.getText())) {
-                runPartFirst.setText(runPartFirst.getText().split("[.:]", 2)[1]);
-                break;
+
+        cleanQuestionContent(question);
+        cleanQuestionAnswers(question);
+
+        validateAnswerRules(question);
+    }
+
+    private void validateAnswerRules(Question question) {
+        // check câu hỏi phải có tối thiểu 2 câu trả lời
+        if (question.getAnswers().size() < 2)
+            throw new AppException(ErrorCode.EXIST_QUESTION_HAS_UNDER_2_ANSWER);
+
+        // check câu hỏi chỉ có 1 đáp án duy nhất
+        boolean hasAnswered = false;
+        for (Answer answer : question.getAnswers())
+            if (answer.isAnswer()) {
+                if (hasAnswered)
+                    throw new AppException(ErrorCode.EXIST_QUESTION_HAS_MANY_ANSWERS_CORRECT);
+                hasAnswered = true;
             }
-            contents.remove();
-        }
-        while (contents.hasNext() && contents.next().getText().trim().isEmpty()) {
-            contents.remove();
-        }
-        if (!question.getContents().isEmpty()) {
-            RunPart runPartFirst = question.getContents().getFirst();
-            runPartFirst.setText(runPartFirst.getText().replaceFirst("^\\s+", ""));
-            question.getContents().removeLast();
-        }
-        Iterator<Answer> answers = question.getAnswers().iterator();
-        while (answers.hasNext()) {
-            Answer answer = answers.next();
+
+        // không có đáp án nào đúng
+        if (!hasAnswered)
+            throw new AppException(ErrorCode.EXIST_QUESTION_HAS_NO_ANSWER_CORRECT);
+    }
+
+    private void cleanQuestionAnswers(Question question) {
+
+        for (Answer answer : question.getAnswers()) {
+            // set các thuộc tính cho câu trả lời
             if (!answer.getContents().isEmpty()) {
                 RunPart partFirst = answer.getContents().getFirst();
                 if (ExamUtil.checkAnswerCorrect(partFirst))
@@ -171,23 +173,92 @@ public class ReadFileService {
                 if (ExamUtil.checkAnswerNotMix(partFirst))
                     answer.setNotMix(true);
             }
+
+            // Loại bỏ phần đầu câu trả lời VD: A.
             while (!answer.getContents().isEmpty()) {
                 RunPart runPart = answer.getContents().getFirst();
                 if (ExamUtil.containsPunctuation(runPart.getText())) {
                     runPart.setText(runPart.getText().split("[.:]", 2)[1]);
+                    if (runPart.getText().trim().isEmpty())
+                        answer.getContents().removeFirst();
                     break;
                 }
                 answer.getContents().removeFirst();
             }
+
+            // Loại bỏ các khoảng trống ở đầu
             if (!answer.getContents().isEmpty()) {
                 RunPart runPartFirst = answer.getContents().getFirst();
                 runPartFirst.setText(runPartFirst.getText().replaceFirst("^\\s+", ""));
             }
-            if (answer.getContents().stream()
-                    .map(RunPart::getText)
-                    .noneMatch(text -> text != null && !text.trim().isEmpty())) {
-                answers.remove();
-            }
+
+//            if (!answer.isAnswer() && answer.getContents().stream()
+//                .map(RunPart::getText)
+//                .noneMatch(text -> text != null && !text.trim().isEmpty())) {
+//                answers.remove();
+//            }
         }
+    }
+
+    private void cleanQuestionContent(Question question) {
+        Iterator<RunPart> contents = question.getContents().iterator();
+
+        // Loại phần đầu "Câu 1."
+        while (contents.hasNext()) {
+            RunPart part = contents.next();
+            if (ExamUtil.containsPunctuation(part.getText())) {
+                part.setText(part.getText().split("[.:]", 2)[1]);
+                if (part.getText().trim().isEmpty()) contents.remove();
+                break;
+            }
+            contents.remove();
+        }
+
+        // Loại khoảng trắng thừa
+        while (contents.hasNext()) {
+            String text = contents.next().getText();
+            if (text == null || text.trim().isEmpty()) contents.remove();
+            else break;
+        }
+
+        if (!question.getContents().isEmpty()) {
+            RunPart first = question.getContents().getFirst();
+            first.setText(first.getText().replaceFirst("^\\s+", ""));
+        }
+    }
+
+    private GroupAnalystRequest createNewGroupRequest(String name) {
+        GroupAnalystRequest group = new GroupAnalystRequest();
+        group.setName(name);
+        return group;
+    }
+
+    private Group createGroup(GroupAnalystRequest groupAnalyst, int stt) {
+        Group group = new Group();
+        String name = groupAnalyst.getName();
+        if (name.startsWith("#")) {
+            group.setNotMix(true);
+            name = name.replace("#", "");
+        }
+        group.setName(name);
+        group.setStt(stt);
+        return group;
+    }
+
+    private Question processQuestion(PartAnalystRequest part, Group group, int stt) {
+        Question question = examAnalyst.analystQuestion(part);
+        settingQuestion(question);
+        question.setStt(stt);
+        question.setGroup(group);
+        setSttRunPart(question.getContents());
+        return question;
+    }
+
+    private Description processDescription(PartAnalystRequest part, Group group, int stt) {
+        Description desc = examAnalyst.analystDescription(part);
+        desc.setStt(stt);
+        desc.setGroup(group);
+        setSttRunPart(desc.getContents());
+        return desc;
     }
 }

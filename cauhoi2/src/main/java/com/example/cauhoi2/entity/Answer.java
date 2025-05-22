@@ -1,10 +1,8 @@
-package com.example.cauhoi2.entity.file_data;
+package com.example.cauhoi2.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +24,7 @@ public class Answer {
     boolean isAnswer;
     boolean isNotMix;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "question_id")
     Question question;
 
