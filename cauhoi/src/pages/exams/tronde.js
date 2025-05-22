@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getExam } from "../../services/api/ExamService";
 import { exportFile } from "../../services/api/FileService";
-import SideBar from "../../components/SideBar";
+import SideBar from "../../components/Sidebar";
 const TronDe = () => {
     document.title = 'Trộn đề';
     const [searchParams] = useSearchParams();
