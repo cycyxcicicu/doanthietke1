@@ -12,8 +12,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class QuestionResponse {
+public class GroupResponse {
     String id;
-    List<RunPartResponse> contents;
-    List<AnswerResponse> answers;
+    String name;
+    List<DescriptionResponse> descriptions;
+    List<QuestionResponse> questions;
+    boolean isNotMix;
 }

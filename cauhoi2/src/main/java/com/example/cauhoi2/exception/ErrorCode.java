@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatusCode;
 
 @Getter
 public enum ErrorCode {
-    UNCREATED_USER(9999,"uncreate existed", HttpStatus.BAD_REQUEST),
+    UNCREATED_USER(1010,"uncreate user", HttpStatus.BAD_REQUEST),
     INVALID_KEY(1001,"Invalid message key", HttpStatus.BAD_REQUEST),
     USER_EXISTED(1002, "user existed", HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1003,"Username must be ai least character", HttpStatus.BAD_REQUEST),
@@ -25,15 +25,21 @@ public enum ErrorCode {
     PASSWORD_INCORRECT(1007, "Password incorrect", HttpStatus.BAD_REQUEST),
     COURSE_NOT_FOUND(1008, "Course not found", HttpStatus.BAD_REQUEST),
     COURSE_EXISTED(1009, "Course existed", HttpStatus.BAD_REQUEST),
-    CATEGORY_EXISTED(1010, "Course existed", HttpStatus.BAD_REQUEST),
-    CATEGORY_NOT_FOUND(1011, "Category not found", HttpStatus.BAD_REQUEST),
+    CANNOT_READ_FILE(1010, "Cannot read data in file", HttpStatus.BAD_REQUEST),
+    CANNOT_SAVE_IMAGE(1011, "Cannot save image", HttpStatus.BAD_REQUEST),
+    IMAGE_NOT_EXISTED(1012, "Image not existed", HttpStatus.BAD_REQUEST),
+    EXAM_NOT_EXISTED(1013, "Exam not existed", HttpStatus.BAD_REQUEST),
+    IMAGE_CANNOT_REMOVE(1014, "Cannot remove image", HttpStatus.BAD_REQUEST),
+    EXIST_QUESTION_HAS_NO_ANSWER_CORRECT(1015, "Exist question has no answer correct", HttpStatus.BAD_REQUEST),
+    EXIST_QUESTION_HAS_MANY_ANSWERS_CORRECT(1016, "Exist question has many answers correct", HttpStatus.BAD_REQUEST),
+    EXIST_QUESTION_HAS_UNDER_2_ANSWER(1017, "Exist question has under 2 answer", HttpStatus.BAD_REQUEST)
     ;
     ErrorCode(int code, String message, HttpStatus httpStatusCode) {
         this.code = code;
         this.message = message;
         this.httpStatus = httpStatusCode;
     }
-    private HttpStatusCode httpStatus;
-    private int code;
-    private String message;
+    private final HttpStatusCode httpStatus;
+    private final int code;
+    private final String message;
 }

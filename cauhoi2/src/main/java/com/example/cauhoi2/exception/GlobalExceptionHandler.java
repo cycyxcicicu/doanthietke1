@@ -1,6 +1,8 @@
 package com.example.cauhoi2.exception;
 
-import com.example.cauhoi2.dto.request.ApiResponse;
+import com.example.cauhoi2.dto.response.ApiResponse;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,15 +10,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
-//     @ExceptionHandler(value = RuntimeException.class)
-//    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException  exception){
-//     ApiResponse apiResponse = new ApiResponse<>();
-//     apiResponse.setCode(ErrorCode.UNCREATE_USER.getCode());
-//     apiResponse.setMessage(ErrorCode.UNCREATE_USER.getMessage());
-//     return ResponseEntity.badRequest().body(apiResponse);
-//    }
+     @ExceptionHandler(value = RuntimeException.class)
+    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException  exception) {
+         log.info("message error: ", exception.getMessage());
+     return ResponseEntity.badRequest().body(ApiResponse.builder().code(9999).message(exception.getMessage()).build());
+    }
 
    @ExceptionHandler(value = AppException.class)
    ResponseEntity<ApiResponse> handlingAppException(AppException  exception){

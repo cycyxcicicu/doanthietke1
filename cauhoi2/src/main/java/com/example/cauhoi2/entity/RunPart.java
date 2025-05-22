@@ -7,27 +7,31 @@ import lombok.experimental.FieldDefaults;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "questions")
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Question {
+public class RunPart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @Enumerated(EnumType.STRING)
+    RunPartType type;
+
+    @OneToMany
     @OrderBy("stt ASC")
-    List<RunPart> contents = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question")
-    @OrderBy("stt ASC")
-    List<Answer> answers = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    Group group;
-
+    List<Image> images = new ArrayList<>();
+    @Column(columnDefinition = "TEXT")
+    String text;
+    boolean isToDam;
+    boolean isGachChan;
+    boolean isInNghieng;
+    boolean isEndLine;
+    String maMauChu;
     int stt;
+    Integer width;
+    Integer height;
 }

@@ -1,17 +1,13 @@
 package com.example.cauhoi2.dto.response;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@lombok.Data
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ImageResponse {
-    private int status;
-    private boolean success;
-    private Data1 data;
+    String id;
+    String link;
 }

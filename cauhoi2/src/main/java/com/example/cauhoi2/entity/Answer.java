@@ -7,12 +7,13 @@ import lombok.experimental.FieldDefaults;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "questions")
+@Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Question {
+public class Answer {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -21,13 +22,12 @@ public class Question {
     @OrderBy("stt ASC")
     List<RunPart> contents = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "question")
-    @OrderBy("stt ASC")
-    List<Answer> answers = new ArrayList<>();
+    boolean isAnswer;
+    boolean isNotMix;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    Group group;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "question_id")
+    Question question;
 
     int stt;
 }

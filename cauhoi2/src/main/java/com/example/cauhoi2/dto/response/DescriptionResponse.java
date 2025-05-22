@@ -12,8 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class QuestionResponse {
+public class DescriptionResponse {
     String id;
     List<RunPartResponse> contents;
-    List<AnswerResponse> answers;
 }
