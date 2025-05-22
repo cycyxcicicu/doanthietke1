@@ -1,41 +1,30 @@
-package com.example.cauhoi2.entity;
+package com.example.cauhoi2.entity.file_data;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-@Entity
+
+@Entity(name = "questions_file")
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String content;
-    @ElementCollection
-    List<String> answers;
-    @ElementCollection
-    List<Integer> choices;
-    @OneToMany
-    List<Image> images;
-    Integer countAnswer;
-    @Enumerated(EnumType.STRING)
-    LevelQuestion level;
-    @Builder.Default
-    Boolean isDeleted = false;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "category_id")
-    Category category;
-    Date timeCreate;
-    @PrePersist
-    void onCreate() {
-        timeCreate = new Date();
-    }
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("stt ASC")
+    List<RunPart> contents = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @OrderBy("stt ASC")
+    List<Answer> answers = new ArrayList<>();
+
+    int stt;
 }

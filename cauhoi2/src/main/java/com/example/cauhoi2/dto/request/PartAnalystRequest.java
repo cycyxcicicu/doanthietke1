@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PartAnalyst {
+public class PartAnalystRequest {
     List<XWPFParagraph> values = new ArrayList<>();
     boolean isQuestion;
     boolean addedAnswered;

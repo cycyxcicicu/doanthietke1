@@ -1,13 +1,11 @@
 package com.example.cauhoi2.dto.response.file_data;
 
-import com.example.cauhoi2.entity.file_data.Question;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,6 +15,6 @@ import java.util.List;
 public class GroupResponse {
     String id;
     String name;
-    List<DescriptionQuestionResponse> items;
+    List<DescriptionQuestionResponse> descriptionQuestionResponses;
     List<QuestionResponse> questions;
 }

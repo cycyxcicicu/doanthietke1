@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GroupAnalyst {
+public class GroupAnalystRequest {
     String name;
-    List<PartAnalyst> parts = new ArrayList<>();
+    List<PartAnalystRequest> parts = new ArrayList<>();
 }

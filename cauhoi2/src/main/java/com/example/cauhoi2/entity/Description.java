@@ -8,12 +8,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name = "questions_file")
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Question {
+public class DescriptionQuestion {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -22,9 +24,7 @@ public class Question {
     @OrderBy("stt ASC")
     List<RunPart> contents = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("stt ASC")
-    List<Answer> answers = new ArrayList<>();
+    @ManyToOne
 
     int stt;
 }
