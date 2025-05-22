@@ -1,4 +1,4 @@
-package com.example.cauhoi2.dto.response.file_data;
+package com.example.cauhoi2.dto.response;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
