@@ -181,6 +181,21 @@ const Trangchu = () => {
 								</ul>
 							</div>
 						</div>
+						<div className="mt-6">
+							<div className="border-[2px] border-dashed border-red-500 bg-red-200 flex flex-col p-4 rounded">
+								<ul className="list-disc pl-6 space-y-2">
+									<li className="list-none font-bold">
+										Lưu ý:
+									</li>
+									<li className="list-none">
+										- Hệ thống hiện tại chỉ đọc được các văn bản thông thường và các hình ảnh (nếu có). 
+									</li>
+									<li className="list-none">
+										- Nếu có các ký tự đặc biệt như ký tự toán học thì hệ thống vẫn đọc được đề nhưng sẽ để trống các phần đó.
+									</li>
+								</ul>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
